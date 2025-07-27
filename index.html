@@ -8,63 +8,78 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Raleway:wght@700;800&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Warm Neutrals with Blue Accent -->
-    <!-- Application Structure Plan: The SPA is designed as a modern, single-page marketing website, departing from the linear slide-deck format. The structure includes: a sticky navigation header for immediate access to key areas; a hero section for impact; and distinct, scrollable sections for About, Services, Advantage, Process, and Contact. The core interaction is a tab-based system in the 'Services' section, allowing users to explore the three main business pillars (Development, IT, Marketing) without being overwhelmed by information. This non-linear, organized structure was chosen to empower potential clients to quickly find information relevant to their needs, improving usability and engagement over a passive presentation. A new AI strategy section is added to provide interactive, personalized value. -->
-    <!-- Visualization & Content Choices: Report Info: Three distinct service categories with detailed sub-points. -> Goal: Organize & Inform. -> Viz/Presentation Method: An interactive tabbed component. -> Interaction: User clicks on a service tab (e.g., 'Software & Web Development'), and the corresponding detailed information is displayed, while content for other tabs is hidden. This is managed with vanilla JS. -> Justification: Prevents information overload, creates a clean UI, and encourages active user exploration. Report Info: The 'Alway Advantage' points. -> Goal: Inform & Compare. -> Viz/Presentation Method: A 2x2 grid layout with icons and descriptive text. -> Interaction: Subtle hover effects to add dynamism. -> Justification: A visually balanced grid allows for quick scanning and comprehension of key benefits. Report Info: The 4-step 'Simple Process'. -> Goal: Explain Change/Flow. -> Viz/Presentation Method: A visually distinct, vertical step-flow diagram built with HTML/CSS. -> Interaction: None required, the visual layout itself enhances clarity. -> Justification: A graphical representation of a process is more engaging and easier to digest than a simple list. New Feature: AI Strategy Generator -> Goal: Engage & Demonstrate Value -> Viz/Presentation Method: An input form and a results display area. -> Interaction: User fills a form, clicks a button, which triggers a call to the Gemini API. The API returns a custom business strategy that is then displayed to the user. -> Justification: This provides a "wow" factor and gives potential clients a tangible, personalized reason to engage with the company. Library/Method: All interactions are handled with vanilla JavaScript and styled with Tailwind CSS. Gemini API is used for text generation. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f5f5f4; /* stone-100 */
-            color: #292524; /* stone-800 */
+            background-color: #0f172a; /* slate-900 */
+            color: #cbd5e1; /* slate-300 */
         }
         .font-raleway {
             font-family: 'Raleway', sans-serif;
         }
         .nav-link {
+            position: relative;
             transition: color 0.3s ease;
         }
-        .nav-link:hover {
-            color: #3b82f6; /* blue-500 */
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #22d3ee; /* cyan-400 */
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
         }
-        .tab-active {
-            background-color: #3b82f6; /* blue-500 */
+        .nav-link:hover {
             color: #ffffff;
         }
+        .nav-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+        .tab-active {
+            background-color: #22d3ee; /* cyan-400 */
+            color: #0f172a; /* slate-900 */
+        }
         .tab-inactive {
-            background-color: #e7e5e4; /* stone-200 */
-            color: #57534e; /* stone-600 */
+            background-color: #1e293b; /* slate-800 */
+            color: #94a3b8; /* slate-400 */
         }
         .tab-button {
             transition: all 0.3s ease-in-out;
         }
-        .advantage-card, .process-step {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .tab-button:hover {
+            background-color: #334155; /* slate-700 */
+        }
+        .advantage-card {
+            background-color: #1e293b; /* slate-800 */
+            border: 1px solid #334155; /* slate-700 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
         .advantage-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            transform: translateY(-8px);
+            border-color: #22d3ee; /* cyan-400 */
+            box-shadow: 0 10px 25px -5px rgb(34 211 238 / 0.2);
         }
-        .chart-container { 
-            position: relative; 
-            width: 100%; 
-            max-width: 600px; 
-            margin-left: auto; 
-            margin-right: auto; 
-            height: 300px; 
-            max-height: 400px; 
+        .process-step-card {
+             background-color: #1e293b; /* slate-800 */
+             border: 1px solid transparent;
+             transition: all 0.3s ease;
         }
-        @media (min-width: 768px) { 
-            .chart-container { 
-                height: 350px; 
-            } 
+        .process-step-card:hover {
+            transform: scale(1.03);
+            border-color: #22d3ee;
         }
         .loader {
-            border: 4px solid #f3f3f3; /* Light grey */
-            border-top: 4px solid #3b82f6; /* Blue */
+            border: 4px solid #334155; /* slate-700 */
+            border-top: 4px solid #22d3ee; /* cyan-400 */
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
@@ -75,97 +90,134 @@
         #strategy-result h3 {
             font-size: 1.25rem;
             font-weight: bold;
-            color: #3b82f6;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-            padding-bottom: 0.25rem;
-            border-bottom: 2px solid #e5e7eb;
+            color: #22d3ee; /* cyan-400 */
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #334155; /* slate-700 */
         }
-         #strategy-result ul {
-            list-style-type: disc;
-            padding-left: 1.5rem;
+        #strategy-result ul {
+            list-style-type: none;
+            padding-left: 0;
             margin-bottom: 1rem;
+        }
+        #strategy-result li {
+            position: relative;
+            padding-left: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+        #strategy-result li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #22d3ee; /* cyan-400 */
+            font-weight: bold;
+        }
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
 
-    <header id="header" class="bg-stone-100/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+    <header id="header" class="bg-slate-900/70 backdrop-blur-lg sticky top-0 z-50 border-b border-slate-800">
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <a href="#hero" class="text-3xl font-bold font-raleway text-blue-500">Alway</a>
+            <a href="#hero" class="text-3xl font-bold font-raleway text-cyan-400">Alway</a>
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#services" class="nav-link text-stone-600 font-medium">Services</a>
-                <a href="#advantage" class="nav-link text-stone-600 font-medium">Advantage</a>
-                <a href="#process" class="nav-link text-stone-600 font-medium">Process</a>
-                <a href="#ai-strategy" class="nav-link text-stone-600 font-medium">✨ AI Strategy</a>
-                <a href="#contact" class="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">Contact Us</a>
+                <a href="#services" class="nav-link text-slate-300 font-medium">Services</a>
+                <a href="#advantage" class="nav-link text-slate-300 font-medium">Advantage</a>
+                <a href="#process" class="nav-link text-slate-300 font-medium">Process</a>
+                <a href="#ai-strategy" class="nav-link text-slate-300 font-medium">AI Strategy ✨</a>
+                <a href="#contact" class="bg-cyan-400 text-slate-900 px-5 py-2 rounded-lg font-semibold hover:bg-cyan-300 transition-colors">Contact Us</a>
             </div>
             <div class="md:hidden">
-                <a href="#contact" class="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">Contact</a>
+                <a href="#contact" class="bg-cyan-400 text-slate-900 px-4 py-2 rounded-lg font-medium hover:bg-cyan-300 transition-colors">Contact</a>
             </div>
         </nav>
     </header>
 
     <main>
-        <section id="hero" class="relative text-center py-20 md:py-32 bg-white">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 class="text-4xl md:text-6xl font-extrabold font-raleway text-stone-800 leading-tight">
-                    Your Vision, <span class="text-blue-500">Our Technology.</span>
-                </h1>
-                <p class="mt-6 max-w-2xl mx-auto text-lg text-stone-600">
-                    We provide innovative and reliable technology solutions that empower businesses to thrive in the digital age. One partner, endless solutions.
-                </p>
-                <div class="mt-10">
-                    <a href="#services" class="bg-blue-500 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-blue-600 transition-all transform hover:scale-105">Explore Our Services</a>
+        <section id="hero" class="relative overflow-hidden py-24 md:py-32">
+            <div class="absolute inset-0 bg-slate-900"></div>
+            <div class="absolute -top-1/2 -right-1/4 w-1/2 h-[150%] bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style="animation-duration: 8s;"></div>
+             <div class="absolute -bottom-1/2 -left-1/4 w-1/2 h-[150%] bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style="animation-duration: 10s;"></div>
+
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative grid md:grid-cols-2 gap-16 items-center">
+                <div class="text-center md:text-left">
+                    <h1 class="text-4xl md:text-6xl font-extrabold font-raleway text-white leading-tight">
+                        Your Vision, <span class="text-cyan-400">Our Technology.</span>
+                    </h1>
+                    <p class="mt-6 max-w-xl text-lg text-slate-400 mx-auto md:mx-0">
+                        We provide innovative and reliable technology solutions that empower businesses to thrive in the digital age. One partner, endless solutions.
+                    </p>
+                    <div class="mt-10">
+                        <a href="#services" class="bg-cyan-400 text-slate-900 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-cyan-300 transition-all transform hover:scale-105 inline-block shadow-lg shadow-cyan-500/20">Explore Our Services</a>
+                    </div>
+                </div>
+                <div class="hidden md:flex justify-center items-center">
+                   <div class="relative w-80 h-80">
+                        <div class="absolute inset-0 bg-slate-800 rounded-2xl transform rotate-12"></div>
+                        <div class="absolute inset-2 bg-slate-700/50 rounded-2xl transform -rotate-12 backdrop-blur-sm border border-slate-600 flex items-center justify-center p-4">
+                            <svg class="w-48 h-48 text-cyan-400 opacity-30" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m3 0l3 2.25-3 2.25m3 0l3 2.25-3 2.25M6.75 12l3-2.25-3-2.25m12.75 6l3-2.25-3-2.25m3 0l3-2.25-3-2.25M9.75 15l3-2.25-3-2.25m12.75 6l3-2.25-3-2.25M9.75 15l3-2.25-3-2.25m3 0l3 2.25-3 2.25" />
+                            </svg>
+                        </div>
+                   </div>
                 </div>
             </div>
         </section>
 
-        <section id="services" class="py-16 md:py-24">
+        <section id="services" class="py-16 md:py-24 fade-in-section">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold font-raleway text-stone-800">Our Integrated Services</h2>
-                    <p class="mt-4 max-w-2xl mx-auto text-stone-600">
-                        We provide a complete ecosystem of technology services to cover all your business needs. Select a service below to see how we can help you build, secure, and grow your business from the ground up.
+                    <h2 class="text-3xl md:text-4xl font-bold font-raleway text-white">Our Integrated Services</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-slate-400">
+                        We provide a complete ecosystem of technology services. Select a service below to see how we build, secure, and grow your business.
                     </p>
                 </div>
                 
                 <div class="max-w-4xl mx-auto">
-                    <div class="flex flex-col sm:flex-row justify-center rounded-lg p-1.5 bg-stone-200 mb-8 space-y-2 sm:space-y-0 sm:space-x-2">
+                    <div class="flex flex-col sm:flex-row justify-center rounded-lg p-1.5 bg-slate-800 mb-8 space-y-2 sm:space-y-0 sm:space-x-2">
                         <button id="tab-btn-dev" data-tab="dev" class="tab-button w-full sm:w-auto flex-1 text-center font-semibold py-3 px-6 rounded-md">Software & Web</button>
                         <button id="tab-btn-it" data-tab="it" class="tab-button w-full sm:w-auto flex-1 text-center font-semibold py-3 px-6 rounded-md">Networking & IT</button>
                         <button id="tab-btn-marketing" data-tab="marketing" class="tab-button w-full sm:w-auto flex-1 text-center font-semibold py-3 px-6 rounded-md">Digital Marketing</button>
                     </div>
                     
-                    <div class="bg-white p-8 rounded-xl shadow-md">
+                    <div class="bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-700">
                         <div id="tab-content-dev" class="tab-content">
-                            <h3 class="text-2xl font-bold text-blue-500 mb-4">Building the Future of Your Business.</h3>
-                            <p class="text-stone-600 mb-6">Our development team turns your ideas into powerful, high-performance applications and websites.</p>
-                            <ul class="space-y-4 text-stone-700">
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Custom Software Solutions:</strong> Tailor-made software that solves your unique business challenges.</li>
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Responsive Web Development:</strong> Beautiful, modern websites that look perfect on any device.</li>
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>E-commerce Platforms:</strong> Robust online stores that drive sales and provide a seamless shopping experience.</li>
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Mobile App Development:</strong> Engaging and intuitive mobile apps for both iOS and Android.</li>
+                            <h3 class="text-2xl font-bold text-cyan-400 mb-4">Building the Future of Your Business.</h3>
+                            <p class="text-slate-400 mb-6">Our development team turns your ideas into powerful, high-performance applications and websites.</p>
+                            <ul class="space-y-4 text-slate-300">
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>Custom Software Solutions:</strong> Tailor-made software that solves your unique business challenges.</li>
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>Responsive Web Development:</strong> Beautiful, modern websites that look perfect on any device.</li>
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>E-commerce Platforms:</strong> Robust online stores that drive sales and provide a seamless shopping experience.</li>
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>Mobile App Development:</strong> Engaging and intuitive mobile apps for both iOS and Android.</li>
                             </ul>
                         </div>
                         <div id="tab-content-it" class="tab-content hidden">
-                            <h3 class="text-2xl font-bold text-blue-500 mb-4">The Backbone of Your Operations.</h3>
-                            <p class="text-stone-600 mb-6">A secure and reliable network is non-negotiable. We keep your systems running at peak performance.</p>
-                             <ul class="space-y-4 text-stone-700">
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Network Design & Management:</strong> Robust, fast, and secure networks designed for your needs.</li>
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Computer & Printer Repair:</strong> Fast and effective repair services to minimize downtime.</li>
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Cybersecurity Solutions:</strong> Protect your valuable data with comprehensive security strategies.</li>
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>24/7 IT Support:</strong> Get peace of mind with our reliable, always-on support plans.</li>
+                            <h3 class="text-2xl font-bold text-cyan-400 mb-4">The Backbone of Your Operations.</h3>
+                            <p class="text-slate-400 mb-6">A secure and reliable network is non-negotiable. We keep your systems running at peak performance.</p>
+                             <ul class="space-y-4 text-slate-300">
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>Network Design & Management:</strong> Robust, fast, and secure networks designed for your needs.</li>
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>Computer & Printer Repair:</strong> Fast and effective repair services to minimize downtime.</li>
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>Cybersecurity Solutions:</strong> Protect your valuable data with comprehensive security strategies.</li>
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>24/7 IT Support:</strong> Get peace of mind with our reliable, always-on support plans.</li>
                             </ul>
                         </div>
                         <div id="tab-content-marketing" class="tab-content hidden">
-                            <h3 class="text-2xl font-bold text-blue-500 mb-4">Connect, Engage, and Grow.</h3>
-                            <p class="text-stone-600 mb-6">A strong online presence is essential. Our experts help you cut through the noise and achieve measurable results.</p>
-                             <ul class="space-y-4 text-stone-700">
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Search Engine Optimization (SEO):</strong> Climb the rankings and make it easy for customers to find you.</li>
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Social Media Management (SMM):</strong> Build a vibrant community around your brand.</li>
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Content Marketing:</strong> Attract and retain customers with valuable, relevant content.</li>
-                                <li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">&#10004;</span><strong>Pay-Per-Click (PPC) Advertising:</strong> Drive targeted traffic with strategic ad campaigns.</li>
+                            <h3 class="text-2xl font-bold text-cyan-400 mb-4">Connect, Engage, and Grow.</h3>
+                            <p class="text-slate-400 mb-6">A strong online presence is essential. Our experts help you cut through the noise and achieve measurable results.</p>
+                             <ul class="space-y-4 text-slate-300">
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>Search Engine Optimization (SEO):</strong> Climb the rankings and make it easy for customers to find you.</li>
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>Social Media Management (SMM):</strong> Build a vibrant community around your brand.</li>
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>Content Marketing:</strong> Attract and retain customers with valuable, relevant content.</li>
+                                <li class="flex items-start"><span class="text-cyan-400 mr-3 mt-1">&#10004;</span><strong>Pay-Per-Click (PPC) Advertising:</strong> Drive targeted traffic with strategic ad campaigns.</li>
                             </ul>
                         </div>
                     </div>
@@ -173,110 +225,126 @@
             </div>
         </section>
 
-        <section id="advantage" class="py-16 md:py-24 bg-white">
+        <section id="advantage" class="py-16 md:py-24 bg-slate-900/50 fade-in-section">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold font-raleway text-stone-800">The Alway Advantage</h2>
-                    <p class="mt-4 max-w-2xl mx-auto text-stone-600">
-                        Choosing a technology partner is a critical decision. We are committed to delivering not just solutions, but also a superior experience that makes us the right choice for your business's future.
+                    <h2 class="text-3xl md:text-4xl font-bold font-raleway text-white">The Alway Advantage</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-slate-400">
+                        Choosing a technology partner is a critical decision. We deliver not just solutions, but a superior experience.
                     </p>
                 </div>
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="advantage-card bg-stone-50 p-8 rounded-xl text-center">
-                        <div class="text-4xl text-blue-500 mb-4">&#128452;</div>
-                        <h3 class="text-xl font-bold mb-2">One-Stop-Shop</h3>
-                        <p class="text-stone-600">From code to clicks, we handle all your technology needs under one roof, ensuring seamless strategy and execution.</p>
+                    <div class="advantage-card p-8 rounded-xl text-center">
+                        <div class="text-4xl text-cyan-400 mb-4 inline-block">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white">One-Stop-Shop</h3>
+                        <p class="text-slate-400">From code to clicks, we handle all your technology needs under one roof, ensuring seamless strategy.</p>
                     </div>
-                    <div class="advantage-card bg-stone-50 p-8 rounded-xl text-center">
-                        <div class="text-4xl text-blue-500 mb-4">&#129309;</div>
-                        <h3 class="text-xl font-bold mb-2">Customer-Centric</h3>
-                        <p class="text-stone-600">We take the time to understand your goals and craft solutions that are perfectly aligned with your vision.</p>
+                    <div class="advantage-card p-8 rounded-xl text-center">
+                        <div class="text-4xl text-cyan-400 mb-4 inline-block">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Customer-Centric</h3>
+                        <p class="text-slate-400">We take the time to understand your goals and craft solutions perfectly aligned with your vision.</p>
                     </div>
-                    <div class="advantage-card bg-stone-50 p-8 rounded-xl text-center">
-                        <div class="text-4xl text-blue-500 mb-4">&#128104;&zwj;&#128187;</div>
-                        <h3 class="text-xl font-bold mb-2">Expert Team</h3>
-                        <p class="text-stone-600">Our certified professionals are passionate about technology and dedicated to delivering excellence for your success.</p>
+                    <div class="advantage-card p-8 rounded-xl text-center">
+                        <div class="text-4xl text-cyan-400 mb-4 inline-block">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Expert Team</h3>
+                        <p class="text-slate-400">Our certified professionals are passionate about technology and dedicated to delivering excellence.</p>
                     </div>
-                    <div class="advantage-card bg-stone-50 p-8 rounded-xl text-center">
-                        <div class="text-4xl text-blue-500 mb-4">&#128640;</div>
-                        <h3 class="text-xl font-bold mb-2">Future-Ready</h3>
-                        <p class="text-stone-600">We use the latest technologies and strategies to ensure your business is prepared for tomorrow's challenges.</p>
+                    <div class="advantage-card p-8 rounded-xl text-center">
+                        <div class="text-4xl text-cyan-400 mb-4 inline-block">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Future-Ready</h3>
+                        <p class="text-slate-400">We use the latest technologies to ensure your business is prepared for tomorrow's challenges.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="process" class="py-16 md:py-24">
+        <section id="process" class="py-16 md:py-24 fade-in-section">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
-                    <h2 class="text-3xl md:text-4xl font-bold font-raleway text-stone-800">Our Simple Process</h2>
-                    <p class="mt-4 max-w-2xl mx-auto text-stone-600">
-                        We believe in a transparent and collaborative journey from idea to implementation. Our streamlined process ensures your project is delivered on time, on budget, and to your complete satisfaction.
+                    <h2 class="text-3xl md:text-4xl font-bold font-raleway text-white">Our Simple Process</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-slate-400">
+                        A transparent and collaborative journey from idea to implementation, ensuring your project is a stunning success.
                     </p>
                 </div>
-                <div class="relative max-w-2xl mx-auto">
-                    <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-stone-300 transform -translate-x-1/2"></div>
-                    <div class="space-y-12">
-                        <div class="process-step relative flex items-center">
-                            <div class="w-1/2 pr-8 text-right">
-                                <h3 class="text-xl font-bold text-blue-500">1. Discover & Strategize</h3>
-                                <p class="text-stone-600 mt-2">We start by listening. We learn about your business, goals, and challenges to create a tailored plan.</p>
-                            </div>
-                            <div class="absolute left-1/2 w-8 h-8 bg-white border-4 border-blue-500 rounded-full transform -translate-x-1/2 flex items-center justify-center font-bold">1</div>
-                            <div class="w-1/2 pl-8"></div>
+                <div class="relative max-w-4xl mx-auto">
+                    <div class="absolute left-1/2 top-4 bottom-4 w-1 bg-slate-700 transform -translate-x-1/2 rounded-full"></div>
+                    
+                    <div class="space-y-16">
+                        <div class="relative flex items-center justify-start md:justify-center">
+                           <div class="w-full md:w-1/2 md:pr-12">
+                               <div class="process-step-card p-6 rounded-lg shadow-lg text-center md:text-right">
+                                    <h3 class="text-xl font-bold text-cyan-400">1. Discover & Strategize</h3>
+                                    <p class="text-slate-400 mt-2">We start by listening. We learn about your business, goals, and challenges to create a tailored plan.</p>
+                               </div>
+                           </div>
+                            <div class="absolute left-1/2 w-8 h-8 bg-slate-900 border-4 border-cyan-400 rounded-full transform -translate-x-1/2 grid place-items-center font-bold text-white z-10">1</div>
                         </div>
-                        <div class="process-step relative flex items-center">
-                            <div class="w-1/2 pr-8"></div>
-                            <div class="absolute left-1/2 w-8 h-8 bg-white border-4 border-blue-500 rounded-full transform -translate-x-1/2 flex items-center justify-center font-bold">2</div>
-                            <div class="w-1/2 pl-8 text-left">
-                                <h3 class="text-xl font-bold text-blue-500">2. Execute & Build</h3>
-                                <p class="text-stone-600 mt-2">Our team gets to work, building, implementing, and launching your project with precision and care.</p>
-                            </div>
+
+                         <div class="relative flex items-center justify-end md:justify-center">
+                           <div class="w-full md:w-1/2 md:pl-12">
+                               <div class="process-step-card p-6 rounded-lg shadow-lg text-center md:text-left">
+                                    <h3 class="text-xl font-bold text-cyan-400">2. Execute & Build</h3>
+                                    <p class="text-slate-400 mt-2">Our team gets to work, building, implementing, and launching your project with precision and care.</p>
+                               </div>
+                           </div>
+                            <div class="absolute left-1/2 w-8 h-8 bg-slate-900 border-4 border-cyan-400 rounded-full transform -translate-x-1/2 grid place-items-center font-bold text-white z-10">2</div>
                         </div>
-                        <div class="process-step relative flex items-center">
-                            <div class="w-1/2 pr-8 text-right">
-                                <h3 class="text-xl font-bold text-blue-500">3. Launch & Optimize</h3>
-                                <p class="text-stone-600 mt-2">We ensure a smooth launch and then continuously monitor performance to optimize for the best results.</p>
-                            </div>
-                            <div class="absolute left-1/2 w-8 h-8 bg-white border-4 border-blue-500 rounded-full transform -translate-x-1/2 flex items-center justify-center font-bold">3</div>
-                            <div class="w-1/2 pl-8"></div>
+
+                        <div class="relative flex items-center justify-start md:justify-center">
+                           <div class="w-full md:w-1/2 md:pr-12">
+                               <div class="process-step-card p-6 rounded-lg shadow-lg text-center md:text-right">
+                                    <h3 class="text-xl font-bold text-cyan-400">3. Launch & Optimize</h3>
+                                    <p class="text-slate-400 mt-2">We ensure a smooth launch and then continuously monitor performance to optimize for the best results.</p>
+                               </div>
+                           </div>
+                            <div class="absolute left-1/2 w-8 h-8 bg-slate-900 border-4 border-cyan-400 rounded-full transform -translate-x-1/2 grid place-items-center font-bold text-white z-10">3</div>
                         </div>
-                        <div class="process-step relative flex items-center">
-                            <div class="w-1/2 pr-8"></div>
-                            <div class="absolute left-1/2 w-8 h-8 bg-white border-4 border-blue-500 rounded-full transform -translate-x-1/2 flex items-center justify-center font-bold">4</div>
-                            <div class="w-1/2 pl-8 text-left">
-                                <h3 class="text-xl font-bold text-blue-500">4. Support & Grow</h3>
-                                <p class="text-stone-600 mt-2">Our partnership doesn't end at launch. We provide ongoing support to help you scale your business.</p>
-                            </div>
+
+                         <div class="relative flex items-center justify-end md:justify-center">
+                           <div class="w-full md:w-1/2 md:pl-12">
+                               <div class="process-step-card p-6 rounded-lg shadow-lg text-center md:text-left">
+                                    <h3 class="text-xl font-bold text-cyan-400">4. Support & Grow</h3>
+                                    <p class="text-slate-400 mt-2">Our partnership doesn't end at launch. We provide ongoing support to help you scale your business.</p>
+                               </div>
+                           </div>
+                            <div class="absolute left-1/2 w-8 h-8 bg-slate-900 border-4 border-cyan-400 rounded-full transform -translate-x-1/2 grid place-items-center font-bold text-white z-10">4</div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="ai-strategy" class="py-16 md:py-24 bg-white">
+        <section id="ai-strategy" class="py-16 md:py-24 bg-slate-900/50 fade-in-section">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold font-raleway text-stone-800">✨ AI-Powered Strategy Generator</h2>
-                    <p class="mt-4 max-w-2xl mx-auto text-stone-600">
-                        Curious how Alway can help you? Answer a few questions below to get a custom starter strategy for your business, generated instantly by AI.
+                    <h2 class="text-3xl md:text-4xl font-bold font-raleway text-white">✨ AI-Powered Strategy Generator</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-slate-400">
+                        Curious how Alway can help? Get a custom starter strategy for your business, generated instantly by AI.
                     </p>
                 </div>
 
-                <div class="max-w-2xl mx-auto bg-stone-50 p-8 rounded-xl shadow-md">
+                <div class="max-w-2xl mx-auto bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-700">
                     <div id="strategy-form">
                         <div class="space-y-6">
                             <div>
-                                <label for="business-name" class="block text-sm font-medium text-stone-700">Business Name</label>
-                                <input type="text" id="business-name" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Artisan Coffee Roasters">
+                                <label for="business-name" class="block text-sm font-medium text-slate-300">Business Name</label>
+                                <input type="text" id="business-name" class="mt-1 block w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-cyan-400 focus:border-cyan-400 text-white" placeholder="e.g., Artisan Coffee Roasters">
                             </div>
                             <div>
-                                <label for="business-type" class="block text-sm font-medium text-stone-700">Business Type / Industry</label>
-                                <input type="text" id="business-type" class="mt-1 block w-full px-3 py-2 bg-white border border-stone-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Local Cafe & E-commerce">
+                                <label for="business-type" class="block text-sm font-medium text-slate-300">Business Type / Industry</label>
+                                <input type="text" id="business-type" class="mt-1 block w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-cyan-400 focus:border-cyan-400 text-white" placeholder="e.g., Local Cafe & E-commerce">
                             </div>
                             <div>
-                                <label for="business-goal" class="block text-sm font-medium text-stone-700">Primary Goal</label>
-                                <select id="business-goal" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-stone-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <label for="business-goal" class="block text-sm font-medium text-slate-300">Primary Goal</label>
+                                <select id="business-goal" class="mt-1 block w-full pl-4 pr-10 py-2 text-base bg-slate-900 border-slate-600 focus:outline-none focus:ring-cyan-400 focus:border-cyan-400 rounded-md text-white">
                                     <option>Increase Online Sales</option>
                                     <option>Improve Brand Awareness</option>
                                     <option>Launch a New Product</option>
@@ -286,38 +354,38 @@
                             </div>
                         </div>
                         <div class="mt-8">
-                            <button id="generate-strategy-btn" class="w-full bg-blue-500 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-blue-600 transition-all transform hover:scale-105">Generate My Strategy ✨</button>
+                            <button id="generate-strategy-btn" class="w-full bg-cyan-400 text-slate-900 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-cyan-300 transition-all transform hover:scale-105 shadow-lg shadow-cyan-500/20">Generate My Strategy ✨</button>
                         </div>
                     </div>
                     <div id="strategy-loader" class="hidden">
                         <div class="loader"></div>
-                        <p class="text-center text-stone-600">Generating your custom strategy...</p>
+                        <p class="text-center text-slate-400">Generating your custom strategy...</p>
                     </div>
                     <div id="strategy-result-container" class="hidden">
-                         <h2 class="text-2xl font-bold text-center mb-4 text-stone-800">Your Custom Strategy Outline</h2>
-                        <div id="strategy-result" class="prose max-w-none text-stone-700"></div>
-                        <button id="start-over-btn" class="mt-8 w-full bg-stone-600 text-white px-8 py-2 rounded-lg font-semibold hover:bg-stone-700 transition-colors">Start Over</button>
+                         <h2 class="text-2xl font-bold text-center mb-6 text-white">Your Custom Strategy Outline</h2>
+                         <div id="strategy-result" class="prose max-w-none text-slate-300"></div>
+                         <button id="start-over-btn" class="mt-8 w-full bg-slate-600 text-white px-8 py-2 rounded-lg font-semibold hover:bg-slate-500 transition-colors">Start Over</button>
                     </div>
                 </div>
             </div>
         </section>
 
-
-        <footer id="contact" class="bg-stone-800 text-stone-300">
+        <footer id="contact" class="bg-slate-900 border-t border-slate-800">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div class="text-center">
+                <div class="text-center mb-12">
                     <h2 class="text-3xl font-bold font-raleway text-white">Let's Build Something Great Together</h2>
-                    <p class="mt-4 max-w-xl mx-auto">Ready to take your business to the next level? Schedule a free, no-obligation consultation today!</p>
+                    <p class="mt-4 max-w-xl mx-auto text-slate-400">Ready to take your business to the next level? Schedule a free, no-obligation consultation today!</p>
                     <div class="mt-8">
-                        <a href="mailto:contact@alway-tech.com" class="bg-blue-500 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-blue-600 transition-all transform hover:scale-105 inline-block">Schedule Your Free Consultation</a>
-                    </div>
-                    <div class="mt-12 flex justify-center items-center space-x-8 text-sm">
-                        <span>Email: <a href="mailto:contact@alway-tech.com" class="hover:text-blue-400">contact@alway-tech.com</a></span>
-                        <span>Phone: <a href="tel:555-123-4567" class="hover:text-blue-400">(555) 123-4567</a></span>
+                        <a href="https://wa.me/7025961726?text=Hello%21%20I%20saw%20your%20website%20and%20I'd%20like%20to%20schedule%20a%20free%20consultation." target="_blank" rel="noopener noreferrer" class="bg-cyan-400 text-slate-900 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-cyan-300 transition-all transform hover:scale-105 inline-block shadow-lg shadow-cyan-500/20">Schedule Free Consultation</a>
                     </div>
                 </div>
-                <div class="mt-12 border-t border-stone-700 pt-6 text-center text-stone-400 text-sm">
-                    <p>&copy; 2025 Alway. All Rights Reserved. Your Partner in Digital Transformation.</p>
+                 <div class="mt-16 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                     <p class="text-slate-400 text-sm">&copy; 2025 Alway. All Rights Reserved.</p>
+                     <div class="mt-6 md:mt-0 flex items-center space-x-6 text-sm text-slate-400">
+                         <a href="mailto:contact@alway-tech.com" class="hover:text-cyan-400 transition-colors">contact@alway-tech.com</a>
+                         <span class="text-slate-600">|</span>
+                         <a href="tel:555-123-4567" class="hover:text-cyan-400 transition-colors">(555) 123-4567</a>
+                     </div>
                 </div>
             </div>
         </footer>
@@ -347,7 +415,7 @@
             
             switchTab('dev');
 
-            // AI Strategy Generator Logic
+            // --- AI STRATEGY GENERATOR LOGIC ---
             const strategyForm = document.getElementById('strategy-form');
             const generateBtn = document.getElementById('generate-strategy-btn');
             const loader = document.getElementById('strategy-loader');
@@ -356,6 +424,15 @@
             const startOverBtn = document.getElementById('start-over-btn');
 
             generateBtn.addEventListener('click', async () => {
+                // === PASTE YOUR KEY FROM GOOGLE AI STUDIO IN THE LINE BELOW ===
+                const apiKey = "PASTE_YOUR_SECRET_API_KEY_HERE"; 
+                // =============================================================
+
+                if (apiKey === "PASTE_YOUR_SECRET_API_KEY_HERE" || !apiKey) {
+                    alert("API Key is missing. Please follow the instructions to add your API key to the script.");
+                    return;
+                }
+
                 const businessName = document.getElementById('business-name').value;
                 const businessType = document.getElementById('business-type').value;
                 const businessGoal = document.getElementById('business-goal').value;
@@ -381,28 +458,18 @@
                     - Primary Goal: ${businessGoal}
 
                     Based on this, create a concise, high-level starter strategy proposal. For each of the three service areas, provide 2-3 specific, actionable recommendations that would help this client achieve their primary goal. Present the output clearly with a heading for each service area. Use markdown for formatting.
-
-                    Example structure:
-                    ### Software & Web Development
-                    - Recommendation 1
-                    - Recommendation 2
-
-                    ### Networking & IT Support
-                    - Recommendation 1
-                    - Recommendation 2
-
-                    ### Digital Marketing
-                    - Recommendation 1
-                    - Recommendation 2
                 `;
+                
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                };
 
                 try {
-                    let chatHistory = [];
-                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                    const payload = { contents: chatHistory };
-                    const apiKey = ""; 
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                    
                     const response = await fetch(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -410,25 +477,23 @@
                     });
 
                     if (!response.ok) {
-                        throw new Error(`API request failed with status ${response.status}`);
+                        const errorData = await response.json();
+                        console.error("API Error Details:", errorData);
+                        throw new Error(`API request failed: ${errorData.error.message}`);
                     }
 
                     const result = await response.json();
                     
                     let text = 'Sorry, we could not generate a strategy at this time. Please try again later.';
-                    if (result.candidates && result.candidates.length > 0 &&
-                        result.candidates[0].content && result.candidates[0].content.parts &&
-                        result.candidates[0].content.parts.length > 0) {
+                    if (result.candidates && result.candidates[0].content.parts[0].text) {
                         text = result.candidates[0].content.parts[0].text;
                     }
 
-                    // Convert markdown-style headings and lists to HTML
                     let htmlResult = text
                         .replace(/### (.*?)\n/g, '<h3>$1</h3>')
                         .replace(/\* (.*?)\n/g, '<li>$1</li>')
                         .replace(/- (.*?)\n/g, '<li>$1</li>');
                     
-                    // Wrap list items in ul tags
                     htmlResult = htmlResult.replace(/<h3>(.*?)<\/h3>\s*([\s\S]*?)(?=(<h3>|$))/g, (match, h3, content) => {
                         const listItems = content.trim();
                         if (listItems.startsWith('<li>')) {
@@ -437,12 +502,11 @@
                         return `<h3>${h3}</h3>${content}`;
                     });
 
-
                     resultDiv.innerHTML = htmlResult;
 
                 } catch (error) {
                     console.error("Error calling Gemini API:", error);
-                    resultDiv.innerHTML = '<p class="text-red-500 text-center">An error occurred while generating the strategy. Please check the console for details and try again later.</p>';
+                    resultDiv.innerHTML = `<p class="text-red-400 text-center font-semibold">An error occurred while generating the strategy.</p><p class="text-slate-400 text-center mt-2">Please check that your API key is correct and that the Vertex AI API is enabled in your Google Cloud project, then try again.</p>`;
                 } finally {
                     loader.classList.add('hidden');
                     resultContainer.classList.remove('hidden');
@@ -456,7 +520,22 @@
                 document.getElementById('business-type').value = '';
                 document.getElementById('business-goal').selectedIndex = 0;
             });
+            
+            // Intersection Observer for scroll animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
 
+            const sections = document.querySelectorAll('.fade-in-section');
+            sections.forEach(section => {
+                observer.observe(section);
+            });
         });
     </script>
 </body>
